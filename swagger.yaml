@@ -1,0 +1,5419 @@
+swagger: '2.0'
+info:
+  version: 4.0.0
+  title: Synerise Platform
+  description: Synerise Platform Documentation
+  license:
+    name: proprietary
+host: api.synerise.com
+basePath: /v4
+tags:
+  - name: overview
+    description: >
+      Welcome to Synerise API reference! We hope that you'll enjoy your stay
+      here.
+
+      If you need help with our services, feel free to contact us:
+
+      - [support@synerise.com](mailto:support@synerise.com)
+
+
+      For Synerise's Postman collection, visit:
+
+      - [Synerise postman
+      collection](./assets/SyneriseAPI.postman_collection.json)
+
+
+      Remember that every API call needs to have some headers defined:
+
+
+      | Header Name    | Header Value     |
+
+      |----------------|------------------|
+
+      | Accept         | application/json |
+
+      | Content-Type   | application/json |
+
+      | Api-Version:   | 4.0              |
+    x-traitTag: true
+  - name: API areas
+    description: >
+      We have following groups of endpoints that you can use:
+
+
+      | API area | Description |
+
+      |----------|-------------|
+
+      | [Authorization](#tag/authorization)  | Used for logging in and account
+      management |
+
+      | [Client](#tag/client)  | Used for creating, updating and finding clients
+      |
+
+      | [Events](#tag/events)  | Used for finding events and creating custom
+      ones |
+
+      | [Transactions](#tag/transactions)  | Used for creating, updating and
+      finding transactions |
+  - name: Synerise SDK
+    description: >
+      Our SDK enables integration of Synerise with your app. This constantly
+      updated tool is dedicated to mobile platforms and back-end environments.
+      Use Synerise SDK and feel free to use available documentation, headers for
+      certain programming languages, example source codes.
+
+
+      | SDK | GitHub |
+
+      |----------|-------------|
+
+      | Android SDK  | [View on GitHub](https://github.com/Synerise/android-sdk)
+      |
+
+      | iOS SDK | [View on GitHub](https://github.com/Synerise/ios-sdk) |
+
+      | PHP SDK  | [View on GitHub](https://github.com/Synerise/PHP-SDK) |
+
+      | Java SDK  | [View on GitHub](https://github.com/Synerise/java-sdk) |
+
+      | Magento SDK/Plugin  | [View on
+      GitHub](https://github.com/Synerise/Plugin-Magento) |
+
+      | JS SDK  | [View on GitHub](https://github.com/Synerise/javascript-sdk) |
+
+      | Python SDK  | Working on... |
+
+      | Ruby on Rails SDK  | Working on... |
+  - name: authorization
+    description: >
+      The Synerise Platform uses [JWT](https://jwt.io/) as an authorization
+      method in order to simplify the API consumption
+
+      process. The idea is very simple: you send your credentials to the login
+      endpoint and it returns you a token. Then you
+
+      have to pass it as an `Authorization` header to any subsequent request,
+      just like here: `Authorization: Bearer: [token]`.
+
+      It is valid for 1 hour only, but it does not mean, that you cannot use our
+      API any longer - if you want to
+
+      prolongate the session, you just request the refresh endpoint and a new
+      token is given to you.
+
+
+      Synerise distinguishes three different types of API consumers:
+
+      - *Client* is the end user of your site. The one who browses your pages,
+      makes purchases and uses mobile applications.
+        That person is able to register an account, update it's data and e.g. redeem a coupon, so some endpoints require
+        a login process here, especially when using the mobile application. A client is only able to modify his own data.
+      - *User* is the end user of Synerise. The one who logs in to
+      https://app.synerise.com/ It might be you, or some of
+        your coworkers. Because a large part of user activitites could be automated using our API, a separate login mechanism
+        is required here.
+      - *Profile*
+        We call a Business Profile our relationship with a particular company or organisation. Some of the operations which
+        could be done with Synerise don't fit very well to the previous categories, like e.g. sending batches of client information
+        or transactions. In general you use the Profile authorization if the operation you're about to execute doesn't have
+        a particular physical person (a User or Client) bound to it.
+
+      In order to log-in you have to use an API key. These keys could be
+      created, managed and revoked on demand using
+
+      the [Synerise Application](https://app.synerise.com/api/). They could not
+      be used for different login methods,
+
+      and could have even stricter limitations for specific purposes. More
+      information about those keys could be found
+
+      in our [Knowledge Base](https://synerise.com/knowledge-base/).
+  - name: client
+    description: >
+      One of the most important areas of Synerise is Client management. We call
+      a Client a human being,
+
+      who does some actions on your website or mobile app. Because people tend
+      to use many different devices and not
+
+      always log in from the same location, some nifty data merging strategy is
+      required. This merging process is one of
+
+      our core domain areas - we try to connect many different profiles, which
+      could have been created for a single
+
+      person and we do it by performing sophisticated event analysis.
+
+
+      Because of this fact, the unique identification of the client in Synerise
+      is not that simple, and isn't really a
+
+      good foundation for a REST API.
+
+
+      We admit, though, that it is often very important to send us client data
+      in a programmatical manner. In order to do
+
+      so, we expect from you to send at least one of most important client
+      determinants - email address, phone number,
+
+      your internal identifier of the client, or our numeric identifier. We also
+      accept
+
+      [uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier) for
+      information regarding anonymous clients,
+
+      e.g. those who have used some of your website's features without
+      identifying themselves.
+
+
+      > In order to retrieve and manipulate client data in Synerise, you have to
+      log in as a business profile and use
+
+      > an [Api Key](https://app.synerise.com/api/), which has a `Client` or
+      `Client account management`(check scopes description for details) scope
+      assigned.
+  - name: events
+    description: >
+      Events allow you to track your clients' activities and are extremely
+      helpful in the management process.
+
+      Each event contains name, precise date when the event took place, and
+      sometimes additional data.
+
+      By using and checking events, you can get various useful information about
+      your customers.
+
+
+      For instance, you can check if the client opened your mail, made a
+      purchase or left a cart.
+
+      Events can be also used in automation process, e.g. you can automatically
+      send an SMS to the customer that entered your shop.
+
+      Use this powerful component to improve your knowledge about customers and
+      provide them better services.
+
+
+      [Live Stream](https://app.synerise.com/panel/) shows you events of all
+      your clients in real time.
+
+      You can also check specified client's events, by visiting
+      [CRM](https://app.synerise.com/crm/list) and clicking on the chosen
+      customer.
+
+
+      > In order to create and manage events in Synerise, you have to log in as
+      a business profile and use
+
+      > an [Api Key](https://app.synerise.com/api/), which has an `Event` scope
+      assigned.
+  - name: transactions
+    description: >
+      Synerise allows you to track clients' transactions. Each transaction
+      yields you a lot of information, e.g.
+
+      about a client that made a purchase, list of purchased products with
+      detailed description,
+
+      value and revenue of the transaction, and last but not least - discount
+      data.
+
+
+      Visit [Commerce](https://app.synerise.com/dashboard/transactions) section
+      to check your sales data,
+
+      presented not only in absolute figures, but also in the form of
+      easy-to-read charts.
+
+
+      > In order to create and manage transactions in Synerise, you have to log
+      in as a business profile and use
+
+      > an [Api Key](https://app.synerise.com/api/), which has a `Transaction`
+      scope assigned.
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /auth/login/client:
+    post:
+      tags:
+        - authorization
+      summary: Client login
+      description: >
+        Log in a client in order to obtain the JWT token, which could be used in
+        subsequent requests.
+
+        The token is valid for 1 hour. If you want to use our API longer, you
+        have to request a new one
+
+        by requesting the [Client token
+        refresh](#operation/authRefreshClientGet) endpoint before this time runs
+        out.
+      operationId: authLoginClientPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ClientAuthenticationRequest
+          required: true
+          schema:
+            $ref: '#/definitions/Authorization.ClientAuthenticationRequest'
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: "curl --request POST \\\n  --url https://api.synerise.com/v4/auth/login/client \\\n  --header 'Accept: application/json' \\\n  --header 'Content-Type: application/json' \\\n  --header 'Api-Version: 4.0' \\\n  --data '{\\n\t\"apiKey\":\"2711d1a7-1469-44e3-baf6-dd78490a0376\",\\n\t\"email\": \"john.smith@example.com\",\\n\t\"password\": \"top_secret_pass\"\\n}'\n"
+        - lang: PHP
+          source: "<?php\n\n$request = new HttpRequest();\n$request->setUrl('https://api.synerise.com/v4/auth/login/client');\n$request->setMethod(HTTP_METH_POST);\n\n$request->setHeaders(array(\n  'Content-Type' => 'application/json',\n  'Accept' => 'application/json',\n  'Api-Version' => '4.0'\n));\n\n$request->setBody('{\n\t\"apiKey\": \"2711d1a7-1469-44e3-baf6-dd78490a0376\",\n\t\"email\": \"john.smith@example.com\",\n\t\"password\": \"top_secret_pass\"\n}');\n\ntry {\n  $response = $request->send();\n\n  echo $response->getBody();\n} catch (HttpException $ex) {\n  echo $ex;\n}\n"
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n\t\"apiKey\":
+            \"2711d1a7-1469-44e3-baf6-dd78490a0376\",\n\t\"email\":
+            \"john.smith@example.com\",\n\t\"password\":
+            \"top_secret_pass\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/login/client")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /auth/login/profile:
+    post:
+      tags:
+        - authorization
+      summary: Profile login
+      description: >
+        Log in a profile in order to obtain the JWT token, which could be used
+        in subsequent requests.
+
+        The token is valid for 1 hour. If you want to use our API longer, you
+        have to request a new one
+
+        by requesting the [Profile token
+        refresh](#operation/authRefreshProfileGet) endpoint before this time
+        runs out.
+      operationId: authLoginProfilePost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ProfileAuthenticationRequest
+          required: true
+          schema:
+            $ref: '#/definitions/Authorization.ProfileAuthenticationRequest'
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: "curl --request POST \\\n  --url https://api.synerise.com/v4/auth/login/profile \\\n  --header 'Accept: application/json' \\\n  --header 'Content-Type: application/json' \\\n  --header 'Api-Version: 4.0' \\\n  --data '{\\n\t\"apiKey\":\"2711d1a7-1469-44e3-baf6-dd78490a0376\"\\n}'\n"
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/auth/login/profile');
+
+            $request->setMethod(HTTP_METH_POST);
+
+
+            $request->setHeaders(array(
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json',
+              'Api-Version' => '4.0'
+            ));
+
+
+            $request->setBody('{"apiKey":
+            "2711d1a7-1469-44e3-baf6-dd78490a0376"}');
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n\t\"apiKey\":
+            \"2711d1a7-1469-44e3-baf6-dd78490a0376\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/login/profile")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /auth/login/user:
+    post:
+      tags:
+        - authorization
+      summary: User login
+      description: >
+        Log in a user in order to obtain the JWT token, which could be used in
+        subsequent requests.
+
+        The token is valid for 1 hour. If you want to use our API longer, you
+        have to request a new one
+
+        by requesting the [User token refresh](#operation/authRefreshUserGet)
+        endpoint before this time runs out.
+      operationId: authLoginUserPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: UserAuthenticationRequest
+          required: true
+          schema:
+            $ref: '#/definitions/Authorization.UserAuthenticationRequest'
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: "curl --request POST \\\n  --url https://api.synerise.com/v4/auth/login/user \\\n  --header 'Accept: application/json' \\\n  --header 'Content-Type: application/json' \\\n  --header 'Api-Version: 4.0' \\\n  --data '{\\n\t\"apiKey\":\"2711d1a7-1469-44e3-baf6-dd78490a0376\",\\n\t\"username\": \"john.smith@example.com\",\\n\t\"password\": \"top_secret_pass\"\\n}'\n"
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/auth/login/user');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+              'Api-Version' => '4.0'
+            ));
+
+            $request->setBody('{
+              "apiKey": "2711d1a7-1469-44e3-baf6-dd78490a0376",
+              "username": "john.smith@example.com",
+              "password": "top_secret_pass"
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n\t\"apiKey\":
+            \"2711d1a7-1469-44e3-baf6-dd78490a0376\",\n\t\"username\":
+            \"john.smith@example.com\",\n\t\"password\":
+            \"top_secret_pass\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/login/user")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /auth/refresh/user:
+    get:
+      tags:
+        - authorization
+      summary: User token refresh
+      description: |
+        Retrieves a refreshed JWT token in order to prolongate the user session.
+      operationId: authRefreshUserGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/auth/refresh/user \
+              --header 'Accept: application/json' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --header 'Api-Version: 4.0'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/auth/refresh/user');
+            $request->setMethod(HTTP_METH_GET);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+              'Api-Version' => '4.0'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/refresh/user")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /auth/refresh/profile:
+    get:
+      tags:
+        - authorization
+      summary: Profile token refresh
+      description: >
+        Retrieves a refreshed JWT token in order to prolongate the profile
+        session.
+      operationId: authRefreshProfileGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/auth/refresh/profile \
+              --header 'Accept: application/json' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --header 'Api-Version: 4.0'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/auth/refresh/profile');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json',
+              'Api-Version' => '4.0'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/refresh/profile")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /auth/refresh/client:
+    get:
+      tags:
+        - authorization
+      summary: Client token refresh
+      description: >
+        Retrieves a refreshed JWT token in order to prolongate the client
+        session.
+      operationId: authRefreshClientGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Authorization.AuthenticationResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/auth/refresh/client \
+              --header 'Accept: application/json' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --header 'Api-Version: 4.0'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/auth/refresh/client');
+            $request->setMethod(HTTP_METH_GET);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+              'Api-Version' => '4.0'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/auth/refresh/client")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .addHeader("Api-Version", "4.0")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /transactions/batch:
+    post:
+      tags:
+        - transactions
+      summary: Batch add/update
+      description: >
+        Enqueue a list of batch operations to execute. Every changeset has to be
+        compatible with [Update
+        transaction](#operation/endpointTransactionIdPost).
+
+        If you don't have a value for a field - don't send it at all, because
+        sending `null` may remove existing value.
+
+
+        >Note that every monetary value must be in the same currency. It also
+        must be greater or equal to zero. "discountAmount" is an exception, if
+        it is present, it must be greater than zero.
+      operationId: endpointTransactionBatchPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: transactionList
+          description: List of transactions
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/transactions/batch \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '[\n  {\n  "client": {\n "clientId": 0\n },\n "discountAmount": {\n "amount": 0,\n "currency": "string"\n },\n "orderId": "string",\n "orderStatus": "string",\n "paymentInfo": {},\n "products": [\n {\n "finalUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n "name": "string",\n "netUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n "quantity": 0,\n "regularPrice": {\n "amount": 0,\n "currency": "string"\n },\n "sku": "string",\n "tax": 0\n }\n ],\n "recordedAt": "2017-07-26T12:43:31Z",\n "revenue": {\n "amount": 0,\n "currency": "string"\n },\n "source": "UNDEFINED",\n "value": {\n "amount": 0,\n "currency": "string"\n }\n}\n]'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/transactions/batch');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Aontent-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('[
+              {
+              "client": {
+                "clientId": 0
+              },
+              "discountAmount": {
+                "amount": 0,
+                "currency": "string"
+              },
+              "orderId": "string",
+              "orderStatus": "string",
+              "paymentInfo": {},
+              "products": [
+                {
+                  "finalUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "name": "string",
+                  "netUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "quantity": 0,
+                  "regularPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "sku": "string",
+                  "tax": 0
+                }
+              ],
+              "recordedAt": "2017-07-26T12:43:31Z",
+              "revenue": {
+                "amount": 0,
+                "currency": "string"
+              },
+              "source": "UNDEFINED",
+              "value": {
+                "amount": 0,
+                "currency": "string"
+              }
+            }
+            ]');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "[\n {\n
+            \"client\": {\n \"clientId\": 0\n },\n \"discountAmount\": {\n
+            \"amount\": 0,\n \"currency\": \"string\"\n },\n \"orderId\":
+            \"string\",\n \"orderStatus\": \"string\",\n \"paymentInfo\": {},\n
+            \"products\": [\n {\n \"finalUnitPrice\": {\n \"amount\": 0,\n
+            \"currency\": \"string\"\n },\n \"name\": \"string\",\n
+            \"netUnitPrice\": {\n \"amount\": 0,\n \"currency\": \"string\"\n
+            },\n \"quantity\": 0,\n \"regularPrice\": {\n \"amount\": 0,\n
+            \"currency\": \"string\"\n },\n \"sku\": \"string\",\n \"tax\": 0\n
+            }\n ],\n \"recordedAt\": \"2017-07-26T12:43:31Z\",\n \"revenue\":
+            {\n \"amount\": 0,\n \"currency\": \"string\"\n },\n \"source\":
+            \"UNDEFINED\",\n \"value\": {\n \"amount\": 0,\n \"currency\":
+            \"string\"\n }\n}\n]");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/batch")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/transactions/by-client/{id}':
+    get:
+      tags:
+        - transactions
+      summary: Get client transactions
+      description: |
+        Find transactions associated with client with a certain ID.
+      operationId: endpointTransactionsByClientGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID
+          type: integer
+          format: int64
+        - name: 'time[from]'
+          in: query
+          description: >-
+            Return only transactions that occurred later than given time. If
+            provided, should be earlier than `time[to]`.
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: >-
+            Return only transactions that occurred earlier than given time. If
+            provided, should be later than `time[from]`.
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: How many transactions should be returned.
+          required: false
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+          format: int32
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionListingResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/transactions/by-client/241839194 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/transactions/by-client/241839194');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Accept' => 'application/json',
+              'Content-Type' => 'application/json',
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/by-client/241839194")
+              .get()
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Accept", "application/json")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/transactions/by-email/{email}':
+    get:
+      tags:
+        - transactions
+      summary: Find transactions by email
+      description: |
+        Find transactions associated with client with a certain email.
+      operationId: endpointTransactionsByEmailGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: path
+          description: Client email
+          required: true
+          type: string
+        - name: 'time[from]'
+          in: query
+          description: >-
+            Return only transactions that occurred later than given time. If
+            provided, should be earlier than `time[to]`.
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: >-
+            Return only transactions that occurred earlier than given time. If
+            provided, should be later than `time[from]`.
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: How many transactions should be returned.
+          required: false
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+          format: int32
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionListingResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url 'https://api.synerise.com/v4/transactions/by-email/someEmail@example.com' \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/transactions/by-email/someEmail@example.com');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/by-email/someEmail@example.com")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /transactions/cancelled/batch:
+    post:
+      tags:
+        - transactions
+      summary: Batch add/update cancelled transactions
+      description: >
+        Enqueue a list of batch operations to execute. Every changeset has to be
+        compatible with [Update
+        transaction](#operation/endpointTransactionIdPost).
+
+        If you don't have a value for a field - don't send it at all, because
+        sending `null` may remove existing value.
+
+
+        >Note that every monetary value must be in the same currency. It also
+        must be greater or equal to zero. "discountAmount" is an exception, if
+        it is present, it must be greater than zero.
+      operationId: endpointCancelTransactionBatchPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: transactionList
+          description: List of transactions
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/transactions/cancelled/batch \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '[\n  {\n  "client": {\n "clientId": 0\n },\n "discountAmount": {\n "amount": 0,\n "currency": "string"\n },\n "orderId": "string",\n "orderStatus": "string",\n "paymentInfo": {},\n "products": [\n {\n "finalUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n "name": "string",\n "netUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n "quantity": 0,\n "regularPrice": {\n "amount": 0,\n "currency": "string"\n },\n "sku": "string",\n "tax": 0\n }\n ],\n "recordedAt": "2017-07-26T12:43:31Z",\n "revenue": {\n "amount": 0,\n "currency": "string"\n },\n "source": "UNDEFINED",\n "value": {\n "amount": 0,\n "currency": "string"\n }\n}\n]'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/transactions/cancelled/batch');
+
+            $request->setMethod(HTTP_METH_POST);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Aontent-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            $request->setBody('[
+              {
+              "client": {
+                "clientId": 0
+              },
+              "discountAmount": {
+                "amount": 0,
+                "currency": "string"
+              },
+              "orderId": "string",
+              "orderStatus": "string",
+              "paymentInfo": {},
+              "products": [
+                {
+                  "finalUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "name": "string",
+                  "netUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "quantity": 0,
+                  "regularPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "sku": "string",
+                  "tax": 0
+                }
+              ],
+              "recordedAt": "2017-07-26T12:43:31Z",
+              "revenue": {
+                "amount": 0,
+                "currency": "string"
+              },
+              "source": "UNDEFINED",
+              "value": {
+                "amount": 0,
+                "currency": "string"
+              }
+            }
+
+            ]');
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "[\n {\n
+            \"client\": {\n \"clientId\": 0\n },\n \"discountAmount\": {\n
+            \"amount\": 0,\n \"currency\": \"string\"\n },\n \"orderId\":
+            \"string\",\n \"orderStatus\": \"string\",\n \"paymentInfo\": {},\n
+            \"products\": [\n {\n \"finalUnitPrice\": {\n \"amount\": 0,\n
+            \"currency\": \"string\"\n },\n \"name\": \"string\",\n
+            \"netUnitPrice\": {\n \"amount\": 0,\n \"currency\": \"string\"\n
+            },\n \"quantity\": 0,\n \"regularPrice\": {\n \"amount\": 0,\n
+            \"currency\": \"string\"\n },\n \"sku\": \"string\",\n \"tax\": 0\n
+            }\n ],\n \"recordedAt\": \"2017-07-26T12:43:31Z\",\n \"revenue\":
+            {\n \"amount\": 0,\n \"currency\": \"string\"\n },\n \"source\":
+            \"UNDEFINED\",\n \"value\": {\n \"amount\": 0,\n \"currency\":
+            \"string\"\n }\n}\n]");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/cancelled/batch")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /transactions/cancelled:
+    post:
+      tags:
+        - transactions
+      summary: Post cancelled transaction
+      description: >
+        Post already cancelled transaction.
+
+
+        >Note that every monetary value must be in the same currency. It also
+        must be greater or equal to zero. "discountAmount" is an exception, if
+        it is present, it must be greater than zero.
+      operationId: endpointCancelTransactionPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: transactionData
+          description: Transaction data
+          required: true
+          schema:
+            $ref: '#/definitions/Transactions.TransactionData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/transactions/cancelled \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n  "client": {\n "clientId": 241839194\n  },\n  "discountAmount": {\n "amount": 0,\n "currency": "PLN"\n  },\n  "orderId": "someId",\n  "orderStatus": "status",\n  "paymentInfo": {},\n  "products": [\n {\n "finalUnitPrice": {\n "amount": 100,\n "currency": "PLN"\n },\n "name": "string",\n "netUnitPrice": {\n "amount": 100,\n  "currency": "PLN"\n },\n "quantity": 1,\n "regularPrice": {\n "amount": 100,\n "currency": "PLN"\n },\n "sku": "",\n "tax": 23\n }\n  ],\n  "recordedAt": "2017-07-26T12:43:31Z",\n  "revenue": {\n "amount": 100,\n "currency": "PLN"\n  },\n  "source": "WEB_DESKTOP",\n  "value": {\n "amount": 100,\n "currency": "PLN"\n  }\n}'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/transactions/cancelled');
+
+            $request->setMethod(HTTP_METH_POST);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            $request->setBody('{
+              "client": {
+                "clientId": 241839194
+              },
+              "discountAmount": {
+                "amount": 0,
+                "currency": "PLN"
+              },
+              "orderId": "someId",
+              "orderStatus": "status",
+              "paymentInfo": {},
+              "products": [
+                {
+                  "finalUnitPrice": {
+                    "amount": 100,
+                    "currency": "PLN"
+                  },
+                  "name": "product name",
+                  "netUnitPrice": {
+                    "amount": 100,
+                    "currency": "PLN"
+                  },
+                  "quantity": 1,
+                  "regularPrice": {
+                    "amount": 100,
+                    "currency": "PLN"
+                  },
+                  "sku": "sku",
+                  "tax": 23
+                }
+              ],
+              "recordedAt": "2017-07-26T12:43:31Z",
+              "revenue": {
+                "amount": 100,
+                "currency": "PLN"
+              },
+              "source": "WEB_DESKTOP",
+              "value": {
+                "amount": 0,
+                "currency": "PLN"
+              }
+            }');
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n \"client\":
+            {\n \"clientId\": 241839194\n },\n \"discountAmount\": {\n
+            \"amount\": 0,\n \"currency\": \"PLN\"\n },\n \"orderId\":
+            \"someId\",\n \"orderStatus\": \"status\",\n \"paymentInfo\": {},\n
+            \"products\": [\n {\n \"finalUnitPrice\": {\n \"amount\": 100,\n
+            \"currency\": \"PLN\"\n },\n \"name\": \"product name\",\n
+            \"netUnitPrice\": {\n \"amount\": 100,\n \"currency\": \"PLN\"\n
+            },\n \"quantity\": 1,\n \"regularPrice\": {\n \"amount\": 100,\n
+            \"currency\": \"PLN\"\n },\n \"sku\": \"sku\",\n \"tax\": 23\n }\n
+            ],\n \"recordedAt\": \"2017-07-26T12:43:31Z\",\n \"revenue\": {\n
+            \"amount\": 100,\n \"currency\": \"PLN\"\n },\n \"source\":
+            \"WEB_DESKTOP\",\n \"value\": {\n \"amount\": 0,\n \"currency\":
+            \"PLN\"\n  }\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/cancelled")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/transactions/{id}':
+    post:
+      tags:
+        - transactions
+      summary: Update transaction
+      description: >
+        Update transaction data by ID. If you don't have a value for a field -
+        don't send it at all, because sending `null` may remove existing value.
+
+
+        >Note that every monetary value must be in the same currency. It also
+        must be greater or equal to zero. "discountAmount" is an exception, if
+        it is present, it must be greater than zero.
+      operationId: endpointTransactionIdPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Transaction ID
+          type: string
+        - in: body
+          name: transactionData
+          description: Transaction data
+          required: true
+          schema:
+            $ref: '#/definitions/Transactions.TransactionData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/transactions/%7Bid%7D \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data ' {\n "products": [\n {\n "finalUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n"name": "string",\n "netUnitPrice": {\n "amount": 0,\n "currency": "string"\n },\n "quantity": 0,\n "regularPrice": {\n "amount": 0,\n "currency": "string"\n },\n "sku": "string",\n "tax": 0\n }\n ]\n}'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/transactions/%7Bid%7D');
+
+            $request->setMethod(HTTP_METH_POST);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            $request->setBody(' {
+              "products": [
+                {
+                  "finalUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "name": "string",
+                  "netUnitPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "quantity": 0,
+                  "regularPrice": {
+                    "amount": 0,
+                    "currency": "string"
+                  },
+                  "sku": "string",
+                  "tax": 0
+                }
+              ]
+            }');
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, " {\n \"products\":
+            [\n {\n \"finalUnitPrice\": {\n \"amount\": 0,\n \"currency\":
+            \"string\"\n },\n \"name\": \"string\",\n \"netUnitPrice\": {\n
+            \"amount\": 0,\n \"currency\": \"string\"\n },\n \"quantity\": 0,\n
+            \"regularPrice\": {\n \"amount\": 0,\n \"currency\": \"string\"\n
+            },\n \"sku\": \"string\",\n \"tax\": 0\n }\n ]\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions/%7Bid%7D")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Get transactions
+      description: |
+        Get all transactions.
+      operationId: endpointTransactionsGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: 'time[from]'
+          in: query
+          description: >-
+            Return only transactions that occurred later than given time. If
+            provided, should be earlier than `time[to]`.
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: >-
+            Return only transactions that occurred earlier than given time. If
+            provided, should be later than `time[from]`.
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: How many transactions should be returned.
+          required: false
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+          format: int32
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionListingResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/transactions \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/transactions');
+            $request->setMethod(HTTP_METH_GET);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+    post:
+      tags:
+        - transactions
+      summary: Create transaction
+      description: >
+        Create a new transaction.
+
+
+        >Note that every monetary value must be in the same currency. It also
+        must be greater or equal to zero. "discountAmount" is an exception, if
+        it is present, it must be greater than zero.
+      operationId: endpointTransactionPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: transactionData
+          description: Transaction data
+          required: true
+          schema:
+            $ref: '#/definitions/Transactions.TransactionData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/transactions \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n  "client": {\n "clientId": 241839194\n },\n "discountAmount": {\n "amount": 0,\n "currency": "PLN"\n },\n "orderId": "orderId",\n "orderStatus": "status",\n "paymentInfo": {},\n "products": [\n {\n "finalUnitPrice": {\n "amount": 1,\n "currency": "PLN"\n },\n "name": "product name",\n "netUnitPrice": {\n "amount": 100,\n "currency": "PLN"\n },\n "quantity": 1,\n  "regularPrice": {\n "amount": 100,\n "currency": "PLN"\n },\n "sku": "sku",\n "tax": 23\n }\n ],\n "recordedAt": "2017-07-26T12:43:31Z",\n "revenue": {\n "amount": 100,\n "currency": "PLN"\n },\n "source": "WEB_DESKTOP",\n "value": {\n "amount": 100,\n "currency": "PLN"\n }\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/transactions');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "client": {
+                "clientId": 241839194
+              },
+              "discountAmount": {
+                "amount": 0,
+                "currency": "PLN"
+              },
+              "orderId": "orderId",
+              "orderStatus": "status",
+              "paymentInfo": {},
+              "products": [
+                {
+                  "finalUnitPrice": {
+                    "amount": 1,
+                    "currency": "PLN"
+                  },
+                  "name": "product name",
+                  "netUnitPrice": {
+                    "amount": 100,
+                    "currency": "PLN"
+                  },
+                  "quantity": 1,
+                  "regularPrice": {
+                    "amount": 100,
+                    "currency": "PLN"
+                  },
+                  "sku": "sku",
+                  "tax": 23
+                }
+              ],
+              "recordedAt": "2017-07-26T12:43:31Z",
+              "revenue": {
+                "amount": 100,
+                "currency": "PLN"
+              },
+              "source": "WEB_DESKTOP",
+              "value": {
+                "amount": 100,
+                "currency": "PLN"
+              }
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n \"client\":
+            {\n \"clientId\": 241839194\n },\n \"discountAmount\": {\n
+            \"amount\": 0,\n \"currency\": \"PLN\"\n },\n \"orderId\":
+            \"orderId\",\n \"orderStatus\": \"status\",\n \"paymentInfo\": {},\n
+            \"products\": [\n {\n \"finalUnitPrice\": {\n \"amount\": 1,\n
+            \"currency\": \"PLN\"\n },\n \"name\": \"product name\",\n
+            \"netUnitPrice\": {\n \"amount\": 100,\n \"currency\": \"PLN\"\n
+            },\n \"quantity\": 1,\n \"regularPrice\": {\n \"amount\": 100,\n
+            \"currency\": \"PLN\"\n },\n \"sku\": \"sku\",\n \"tax\": 23\n }\n
+            ],\n \"recordedAt\": \"2017-07-26T12:43:31Z\",\n \"revenue\": {\n
+            \"amount\": 100,\n \"currency\": \"PLN\"\n },\n \"source\":
+            \"WEB_DESKTOP\",\n \"value\": {\n  \"amount\": 100,\n \"currency\":
+            \"PLN\"\n }\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/transactions")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /my-account/transactions:
+    get:
+      tags:
+        - client
+      summary: Get transactions list
+      description: |
+        Use this, to allow clients to check their transactions.
+      operationId: endpointClientTransactionsGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: 'time[from]'
+          in: query
+          description: 'time[from]'
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: 'time[to]'
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: limit
+          required: false
+          type: integer
+          default: 10
+          format: int32
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transactions.TransactionListingResponse'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/my-account/transactions \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/my-account/transactions');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/my-account/transactions")
+              .get()
+              .addHeader("A ccept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/batch:
+    post:
+      tags:
+        - client
+      summary: Batch add/update
+      description: >
+        Enqueue a list of batch operations to execute. Every changeset has to be
+        compatible with [Update client](#operation/endpointClientIdPost).
+
+        If you don't have a value for a field - don't send it at all, because
+        sending `null` may remove existing value.
+      operationId: endpointClientBatchPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: changesetList
+          description: List of changesets
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Client.ClientChangeset'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: "curl --request POST \\\n  --url https://api.synerise.com/v4/clients/batch \\\n  --header 'Accept: application/json' \\\n  --header 'Api-Version: 4.0' \\\n  --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \\\n  --header 'Content-Type: application/json' \\\n  --data '[\\n {\\n \"clientId\": 0,\\n \"email\": \"user@example.com\",\\n \"phone\": \"123456789\",\\n\t\"firstName\": \"John\",\\n\t\"lastName\": \"Doe\",\\n \"displayName\": \"John Doe\",\\n \"uuid\": \"68ddc892-4a07-440a-abcb-45040f940253\",\\n \"agreements\": {\\n \"email\": true\\n },\\n \"attributes\": {\\n \"property1\": \"string\"\\n },\\n \"tags\": [\\n \"string\"\\n ]\\n }\\n]'\n"
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/batch');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('[
+              {
+                "clientId": 0,
+                "email": "user@example.com",
+                "phone": "string",
+                "customId": "string",
+                "firstName": "string",
+                "lastName": "string",
+                "displayName": "string",
+                "uuid": "string",
+                "avatarUrl": "string",
+                "birthDate": "2017-07-11",
+                "company": "string",
+                "city": "string",
+                "address": "string",
+                "zipCode": "string",
+                "province": "string",
+                "countryCode": "string",
+                "sex": "NOT_SPECIFIED",
+                  "agreements": {
+                  "email": true,
+                  "sms": true,
+                  "push": true,
+                  "bluetooth": true,
+                  "rfid": true,
+                  "wifi": true
+                  },
+                  "attributes": {
+                  "property1": "string",
+                  "property2": "string"
+                  },
+                  "tags": [
+                  "string"
+                  ]
+              }
+            ]');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType,
+            "[\n{\n\"clientId\": 0,\n\"email\":
+            \"user@example.com\",\n\"phone\": \"123456789\",\n\"firstName\":
+            \"John\",\n\"lastName\": \"Doe\",\n\"displayName\": \"John
+            Doe\",\n\"uuid\":
+            \"68ddc892-4a07-440a-abcb-45040f940253\",\n\"agreements\":
+            {\n\"email\": true\n},\n\"attributes\": {\n\"property1\":
+            \"string\"\n},\n\"tags\": [\n\"string\"\n]\n}\n]");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/batch")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/by-custom-id/{id}':
+    get:
+      tags:
+        - client
+      summary: Find client by custom ID
+      description: >
+        Find a client by custom ID. Because it has to be unique, only one client
+        could be returned. If no client is
+
+        found, HTTP 404 is returned.
+      operationId: endpointClientByCustomIdGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Custom ID
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Client.ClientView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/by-custom-id/2543678 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/by-custom-id/2543678');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/by-custom-id/2543678")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/by-email/{email}':
+    get:
+      tags:
+        - client
+      summary: Find client by email
+      description: >
+        Find a client by email address. Because it has to be unique, only one
+        client could be returned. If no client is
+
+        found, HTTP 404 is returned.
+      operationId: endpointClientByEmailGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: email
+          in: path
+          description: Email address
+          required: true
+          type: string
+          format: email
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Client.ClientView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/by-email/someEmail@example.com \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/by-email/someEmail@example.com');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/by-email/someEmail@example.com")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/by-list/{id}':
+    get:
+      tags:
+        - client
+      summary: Find clients by list
+      description: >
+        Find clients by a predefined list (created here - [Create client
+        list](#operation/endpointClientListPost)).
+
+        You have to pass the list ID and pagination parameters. If no clients
+        are found, HTTP 404 is returned.
+      operationId: endpointClientByListGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: List ID
+          required: true
+          type: string
+          format: uuid
+        - name: pageIndex
+          in: query
+          description: Page index (1 - based)
+          required: true
+          type: integer
+          format: int32
+        - name: pageSize
+          in: query
+          description: Page size (max. 250)
+          required: true
+          type: integer
+          format: int32
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Client.ClientView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/by-list/bb0c0378-93c7-4f58-9c6a-7cf1e6ddd88b?pageIndex=1&pageSize=2 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/by-list/bb0c0378-93c7-4f58-9c6a-7cf1e6ddd88b');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setQueryData(array(
+              'pageIndex' => '1',
+              'pageSize' => '2'
+            ));
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/by-list/bb0c0378-93c7-4f58-9c6a-7cf1e6ddd88b?pageIndex=1&pageSize=2")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/by-phone/{phone}':
+    get:
+      tags:
+        - client
+      summary: Find client by phone number
+      description: >
+        Find a client by phone number. Because it has to be unique, only one
+        client could be returned. If no client is
+
+        found, HTTP 404 is returned.
+      operationId: endpointClientByPhoneGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: phone
+          in: path
+          description: Phone number
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Client.ClientView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/by-phone/123456789 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/by-phone/123456789');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/by-phone/123456789")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/{id}':
+    get:
+      tags:
+        - client
+      summary: Get client
+      description: |
+        Get client data by client ID.
+      operationId: endpointClientIdGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Client ID
+          required: true
+          type: integer
+          format: int64
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Client.ClientView'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/241839194 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/241839194');
+            $request->setMethod(HTTP_METH_GET);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/241839194")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+    post:
+      tags:
+        - client
+      summary: Update client
+      description: >
+        Update client data by ID.
+
+        If you don't have a value for a field - don't send it at all, because
+        sending `null` may remove existing value.
+      operationId: endpointClientIdPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: clientChangeset
+          description: clientChangeset
+          required: true
+          schema:
+            $ref: '#/definitions/Client.ClientChangeset'
+        - name: id
+          in: path
+          description: Client ID
+          required: true
+          type: integer
+          format: int64
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/clients/241419810 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n  "email": "newEmail@example.com",\n  "phone": "321654987",\n  "company": "new company"\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/241419810');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "email": "newEmail@example.com",
+              "phone": "321654987",
+              "company": "new company"
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n  \"email\":
+            \"newEmail@example.com\",\n  \"phone\": \"321654987\",\n
+            \"company\": \"new company\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/241419810")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+    delete:
+      tags:
+        - client
+      summary: Delete client
+      description: >
+        Delete client by ID.
+
+        We use it internally as an update, and enqueue in the same way as any
+        other modification.
+      operationId: endpointClientIdDelete
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Client ID
+          required: true
+          type: integer
+          format: int64
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request DELETE \
+              --url https://api.synerise.com/v4/clients/241839194 \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/241839194');
+            $request->setMethod(HTTP_METH_DELETE);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/241839194")
+              .delete()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/clients/list/{id}':
+    get:
+      tags:
+        - client
+      summary: Get client list
+      description: >
+        Get a definition of a client list by its ID. Useful e.g. to check it's
+        expiration time.
+      operationId: endpointClientListIdGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Client list ID
+          required: true
+          type: string
+          format: uuid
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Client.ListView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url https://api.synerise.com/v4/clients/list/d3ec8c8e-fe3a-47b4-940a-bb6d0715c81d \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/list/d3ec8c8e-fe3a-47b4-940a-bb6d0715c81d');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/list/d3ec8c8e-fe3a-47b4-940a-bb6d0715c81d")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/list:
+    post:
+      tags:
+        - client
+      summary: Create client list
+      description: >
+        Synerise is able to process millions of clients. Every segment, tag, or
+        other aggregates could be bound to
+
+        thousands of clients. These assignments may change in time, though.
+        Casual implementation of pagination would make
+
+        you effectively unable to capture the state of a list in a given moment
+        in time. Therefore we decided, that every
+
+        time you want to make a list from query, we materialize the set of
+        client IDs which would have been returned at that
+
+        moment and make you able to fetch whole clients from that list by using
+
+        [Find clients by list](#operation/endpointClientByListGet) endpoint.
+      operationId: endpointClientListPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: List criteria
+          description: Set of query parameters which define a list
+          required: true
+          schema:
+            $ref: '#/definitions/Client.ClientListCriteria'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/Client.ListView'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error404'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/clients/list \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n  "segment": 0\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/list');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "segment": 0
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n  \"segment\":
+            0\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/list")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/:
+    post:
+      tags:
+        - client
+      summary: Create client
+      description: >
+        Create a new client record, if no identifier has been assigned for him
+        before in Synerise.
+
+        If you don't have a value for a field - don't send it at all.
+      operationId: endpointClientPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: clientData
+          description: clientData
+          required: true
+          schema:
+            $ref: '#/definitions/Client.NewClientData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/clients/ \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n"email": "user@example.com",\n"phone": "123456789",\n"firstName": "John",\n"lastName": "Doe",\n"displayName": "John Doe",\n"agreements": {\n"email": true\n},\n"attributes": {\n"property1": "property one"\n},\n"tags": [\n"tag"\n]\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "email": "user@example.com",
+              "phone": "123456789",
+              "firstName": "John",
+              "lastName": "Doe",
+              "displayName": "John Doe",
+                "agreements": {
+                "email": true
+                },
+                "attributes": {
+                "property1": "property one"
+                },
+                "tags": [
+                "tag"
+                ]
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n\"email\":
+            \"user@example.com\",\n\"phone\": \"123456789\",\n\"firstName\":
+            \"John\",\n\"lastName\": \"Doe\",\n\"displayName\": \"John
+            Doe\",\n\"agreements\": {\n\"email\": true\n},\n\"attributes\":
+            {\n\"property1\": \"property one\"\n},\n\"tags\":
+            [\n\"tag\"\n]\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/registered:
+    post:
+      tags:
+        - client
+      summary: Register client
+      description: |
+        Use this, to allow clients to register.
+      operationId: endpointRegisterClientPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: clientData
+          description: clientData
+          required: true
+          schema:
+            $ref: '#/definitions/Client.ClientRegistrationData'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/clients/registered \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\r\n  "agreements": {\n    "email": true\n  },\n  "attributes": {\n    "property1": "some property"\n  },\n  "email": "user@example.com",\n  "firstName": "first name",\n  "lastName": "last name",\n  "password": "superpassword"\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/clients/registered');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "agreements": {
+                "email": true
+              },
+              "attributes": {
+                "property1": "some property"
+              },
+              "email": "user@example.com",
+              "firstName": "first name",
+              "lastName": "last name",
+              "password": "superpassword"
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n
+            \"agreements\": {\n    \"email\": true\n  },\n  \"attributes\":
+            {\n    \"property1\": \"some property\"\n  },\n  \"email\":
+            \"user@example.com\",\n  \"firstName\": \"first name\",\n
+            \"lastName\": \"last name\",\n  \"password\":
+            \"superpassword\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/registered")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/password-reset/confirmation:
+    post:
+      tags:
+        - client
+      summary: Password reset confirmation
+      description: >
+        Use this, to allow clients to confirm password reset requests. They
+        should send received token and new password.
+
+        For requesting password reset, check [Password reset
+        confirmation](https://api.synerise.local/openapi/platform.html#operation/endpointRequestResetPost).
+      operationId: endpointResetConfirmationPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Confirmation data
+          required: true
+          schema:
+            $ref: '#/definitions/Client.ClientPasswordResetConfirmation'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: "curl --request POST \\\n  --url https://api.synerise.com/v4/clients/password-reset/confirmation \\\n  --header 'Accept: application/json' \\\n  --header 'Api-Version: 4.0' \\\n  --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\\n\t\"password\":\"secret password\",\\n\t\"token\":\"token\"\\n}'\n"
+        - lang: PHP
+          source: "<?php\n\n$request = new HttpRequest();\n$request->setUrl('https://api.synerise.com/v4/clients/password-reset/confirmation');\n$request->setMethod(HTTP_METH_POST);\n\n$request->setHeaders(array(\n  'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',\n  'Api-Version' => '4.0',\n  'Content-Type' => 'application/json',\n  'Accept' => 'application/json'\n));\n\n$request->setBody('{\n\t\"password\":\"secret password\",\n\t\"token\":\"token\"\n}');\n\ntry {\n  $response = $request->send();\n\n  echo $response->getBody();\n} catch (HttpException $ex) {\n  echo $ex;\n}\n"
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType,
+            "{\n\t\"password\":\"secret password\",\n\t\"token\":\"token\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/password-reset/confirmation")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /clients/password-reset/request:
+    post:
+      tags:
+        - client
+      summary: Request password reset
+      description: >
+        Use this, to allow clients to send requests for resetting their
+        passwords. They will receive a token on the specified email address.
+
+        For confirming request, check [Password reset
+        confirmation](https://api.synerise.local/openapi/platform.html#operation/endpointResetConfirmationPost).
+      operationId: endpointRequestResetPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Client email
+          required: true
+          schema:
+            $ref: '#/definitions/Client.ClientPasswordResetRequest'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/clients/password-reset/request \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n"email":"user@example.com"\n}'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/clients/password-reset/request');
+
+            $request->setMethod(HTTP_METH_POST);
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            $request->setBody('{
+
+            "email":"user@example.com"
+
+            }');
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType,
+            "{\n\"email\":\"user@example.com\"\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/clients/password-reset/request")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /events/all:
+    get:
+      tags:
+        - events
+      summary: Get events
+      description: >
+        If `time[from]` and `time[to]` have been provided, difference between
+        them should be less than **7 days**.
+      operationId: endpointEventsAllGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: 'time[from]'
+          in: query
+          description: >-
+            Return only events that occurred later than given time. If provided,
+            should be earlier than `time[to]`.
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: >-
+            Return only events that occurred earlier than given time. If
+            provided, should be later than `time[from]`.
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: How many events should be returned.
+          required: false
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+          format: integer
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Events.StoredEvent'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error400'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error401'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error403'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url 'https://api.synerise.com/v4/events/all?time%5Bfrom%5D=2017-07-05T08%3A49%3A58.135Z&time%5Bto%5D=2017-07-05T09%3A49%3A58.135Z&limit=1' \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/events/all');
+            $request->setMethod(HTTP_METH_GET);
+
+            $request->setQueryData(array(
+              'time[from]' => '2017-07-05T08:49:58.135Z',
+              'time[to]' => '2017-07-05T09:49:58.135Z',
+              'limit' => '1'
+            ));
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/events/all?time%5Bfrom%5D=2017-07-05T08%3A49%3A58.135Z&time%5Bto%5D=2017-07-05T09%3A49%3A58.135Z&limit=1")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  /events/custom:
+    post:
+      tags:
+        - events
+      summary: Create custom event
+      description: >-
+        Create a new custom event. If you don't have a value for a field - don't
+        send it at all.
+      operationId: endpointEventsCustomPost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: eventData
+          description: Event definition.
+          required: true
+          schema:
+            $ref: '#/definitions/Events.CustomEvent'
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request POST \
+              --url https://api.synerise.com/v4/events/custom \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json' \
+              --data '{\n  "time": "2017-07-29T12:45:23.000Z",\n  "label": "http://example.com/store/item,34",\n  "action": "page.visit",\n  "client": {\n    "id": 1\n  },\n  "params": {\n    "browser": "Google Chrome",\n    "os": "Windows"\n  }\n}'
+        - lang: PHP
+          source: |
+            <?php
+
+            $request = new HttpRequest();
+            $request->setUrl('https://api.synerise.com/v4/events/custom');
+            $request->setMethod(HTTP_METH_POST);
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+            $request->setBody('{
+              "time": "2017-07-29T12:45:23.000Z",
+              "label": "http://example.com/store/item,34",
+              "action": "page.visit",
+                "client": {
+                  "id": 1
+                },
+                "params": {
+                  "browser": "Google Chrome",
+                  "os": "Windows"
+                }
+            }');
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: >
+            OkHttpClient client = new OkHttpClient();
+
+
+            MediaType mediaType = MediaType.parse("application/json");
+
+            RequestBody body = RequestBody.create(mediaType, "{\n  \"time\":
+            \"2017-07-29T12:45:23.000Z\",\n  \"label\":
+            \"http://example.com/store/item,34\",\n  \"action\":
+            \"page.visit\",\n  \"client\": {\n    \"id\": 1\n  },\n  \"params\":
+            {\n    \"browser\": \"Google Chrome\",\n    \"os\": \"Windows\"\n
+            }\n}");
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/events/custom")
+              .post(body)
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+  '/events/by-client/{id}':
+    get:
+      tags:
+        - events
+      summary: Get client events
+      description: >
+        If `time[from]` and `time[to]` have been provided, difference between
+        them should be less than **7 days**.
+      operationId: endpointEventsByClientGet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Client ID
+          required: true
+          type: integer
+          format: int64
+        - name: 'time[from]'
+          in: query
+          description: >-
+            Return only events that occurred later than given time. If provided,
+            should be earlier than `time[to]`.
+          required: false
+          type: string
+          format: date-time
+        - name: 'time[to]'
+          in: query
+          description: >-
+            Return only events that occurred earlier than given time. If
+            provided, should be later than `time[from]`.
+          required: false
+          type: string
+          format: date-time
+        - name: limit
+          in: query
+          description: How many events should be returned.
+          required: false
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+          format: integer
+        - name: Authorization
+          in: header
+          description: 'JWT token (prepended by the `Bearer: ` string)'
+          required: true
+          type: string
+        - name: Api-Version
+          in: header
+          description: 'Requested api version, e.g. `4.0`.'
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: application/json
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: application/json
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Events.StoredEvent'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Error'
+          headers:
+            Application-Version:
+              description: 'Current application version, e.g. `4.0.0`.'
+              type: string
+      x-code-samples:
+        - lang: Bash
+          source: |
+            curl --request GET \
+              --url 'https://api.synerise.com/v4/events/by-client/241692646?time%5Bfrom%5D=2017-07-02T12%3A45%3A23.000Z&time%5Bto%5D=2017-07-06T15%3A45%3A23.000Z' \
+              --header 'Accept: application/json' \
+              --header 'Api-Version: 4.0' \
+              --header 'Authorization: Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' \
+              --header 'Content-Type: application/json'
+        - lang: PHP
+          source: >
+            <?php
+
+
+            $request = new HttpRequest();
+
+            $request->setUrl('https://api.synerise.com/v4/events/by-client/241692646');
+
+            $request->setMethod(HTTP_METH_GET);
+
+
+            $request->setQueryData(array(
+              'time[from]' => '2017-07-02T12:45:23.000Z',
+              'time[to]' => '2017-07-06T15:45:23.000Z'
+            ));
+
+
+            $request->setHeaders(array(
+              'Authorization' => 'Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ',
+              'Api-Version' => '4.0',
+              'Content-Type' => 'application/json',
+              'Accept' => 'application/json'
+            ));
+
+
+            try {
+              $response = $request->send();
+
+              echo $response->getBody();
+            } catch (HttpException $ex) {
+              echo $ex;
+            }
+        - lang: Java
+          source: |
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+              .url("https://api.synerise.com/v4/events/by-client/241692646?time%5Bfrom%5D=2017-07-02T12%3A45%3A23.000Z&time%5Bto%5D=2017-07-06T15%3A45%3A23.000Z")
+              .get()
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .addHeader("Api-Version", "4.0")
+              .addHeader("Authorization", "Bearer: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+              .build();
+
+            Response response = client.newCall(request).execute();
+definitions:
+  Authorization.ClientAuthenticationRequest:
+    type: object
+    required:
+      - apiKey
+      - email
+      - password
+    properties:
+      apiKey:
+        description: Client API key
+        type: string
+        format: uuid
+      email:
+        description: Email address
+        type: string
+        format: email
+      password:
+        description: Password
+        type: string
+        format: password
+      deviceId:
+        description: Device Id
+        type: string
+  Authorization.AuthenticationResponse:
+    type: object
+    properties:
+      token:
+        description: JWT Token
+        type: string
+  Authorization.ProfileAuthenticationRequest:
+    type: object
+    required:
+      - apiKey
+    properties:
+      apiKey:
+        description: Business profile API key
+        type: string
+        format: uuid
+  Authorization.UserAuthenticationRequest:
+    type: object
+    required:
+      - apiKey
+      - password
+      - username
+    properties:
+      apiKey:
+        description: User API key
+        type: string
+        format: uuid
+      username:
+        description: Username
+        type: string
+        format: email
+      password:
+        description: Password
+        type: string
+        format: password
+  Common.Money:
+    type: object
+    description: Amount and currency of the money
+    properties:
+      amount:
+        type: number
+        description: 'Amount, e.g. 12.50'
+      currency:
+        type: string
+        description: Currency of the money (ISO 4217)
+  Events.CustomEvent:
+    type: object
+    properties:
+      time:
+        type: string
+        format: date-time
+        description: >-
+          Exact event occurrence time. Time must be located in past. If ommited,
+          current time will be used.
+      action:
+        type: string
+        description: 'Action describing what happened, e.g. `page.visit`.'
+      label:
+        type: string
+        description: >-
+          Label which helps in event identification, e.g.
+          `http://example.com/store/item,34`.
+      client:
+        type: object
+        description: >-
+          Client identification parameters. You can pass either id or uuid or
+          both.
+        properties:
+          id:
+            type: integer
+            format: int64
+            description: Client ID.
+          uuid:
+            type: string
+            format: uuid
+            description: Client UUID.
+        required:
+          - id
+          - uuid
+      params:
+        type: object
+        description: Additional parameters correlated with event in key -> value manner.
+    required:
+      - action
+      - label
+      - client
+    example:
+      time: '2017-07-29T12:45:23.000Z'
+      label: 'http://example.com/store/item,34'
+      action: page.visit
+      client:
+        id: 1
+      params:
+        browser: Google Chrome
+        os: Windows
+  Events.StoredEventClientIdentification:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Client ID.
+      uuid:
+        type: string
+        format: uuid
+        description: Client UUID.
+    required:
+      - id
+      - uuid
+  Events.StoredEvent:
+    type: object
+    properties:
+      time:
+        type: string
+        format: date-time
+        description: Exact event occurrence time.
+      action:
+        type: string
+        description: 'Action describing what happened, eg. `page.visit`.'
+      label:
+        type: string
+        description: >-
+          Label which helps in event identification, eg.
+          `http://example.com/store/item,34`.
+      client:
+        $ref: '#/definitions/Events.StoredEventClientIdentification'
+        description: >-
+          Client identification parameters. At least one of `id` and `uuid` will
+          be returned.
+      params:
+        type: object
+        description: Additional parameters correlated with event in key -> value manner.
+    required:
+      - time
+      - action
+      - label
+      - client
+      - params
+    example:
+      time: '2017-07-29T12:45:23.000Z'
+      label: 'http://example.com/store/item,34'
+      action: page.visit
+      client:
+        id: 1
+      params:
+        browser: Google Chrome
+        os: Windows
+  Client.AgreementSet:
+    type: object
+    properties:
+      email:
+        description: Email communication agreement
+        type: boolean
+      sms:
+        description: SMS communication agreement
+        type: boolean
+      push:
+        description: Push communication agreement
+        type: boolean
+      bluetooth:
+        description: Bluetooth communication agreement (for mobile)
+        type: boolean
+      rfid:
+        description: RFID communication agreement (for mobile)
+        type: boolean
+      wifi:
+        description: WiFi scanning agreement (for mobile)
+        type: boolean
+  Client.ClientChangeset:
+    type: object
+    description: Set of client's marketing agreements
+    properties:
+      clientId:
+        description: Client ID
+        type: integer
+        format: int64
+      email:
+        type: string
+        description: Email address
+        format: email
+      phone:
+        type: string
+        description: Phone number
+      customId:
+        type: string
+        description: Your custom identifier of this client (e.g. from the external system)
+      firstName:
+        type: string
+        description: First name
+      lastName:
+        type: string
+        description: Last name
+      displayName:
+        type: string
+        description: 'Name used for display, e.g. nickname'
+      uuid:
+        type: string
+        description: Unique identifier of an anonymous client
+        format: uuid
+      avatarUrl:
+        type: string
+        description: URL of the avatar image
+      birthDate:
+        type: string
+        format: date
+        description: 'Birth date, e.g. 1986-04-26'
+      company:
+        type: string
+        description: Company name
+      city:
+        type: string
+        description: City of residence
+      address:
+        type: string
+        description: Address of residence
+      zipCode:
+        type: string
+        description: Zip code
+      province:
+        type: string
+        description: Province name
+      countryCode:
+        type: string
+        description: 'Country code, e.g. "pl" (ISO 3166)'
+      sex:
+        type: string
+        description: Sex
+        enum:
+          - NOT_SPECIFIED
+          - FEMALE
+          - MALE
+      agreements:
+        $ref: '#/definitions/Client.AgreementSet'
+      attributes:
+        type: object
+        description: Custom attributes (you can send us whatever you want)
+        additionalProperties:
+          type: string
+      tags:
+        type: array
+        description: List of tags to assign
+        items:
+          type: string
+  Client.ClientListCriteria:
+    type: object
+    required:
+      - segment
+    properties:
+      segment:
+        description: >-
+          The ID of the segment (for now it is the only supported parameter, but
+          there will be more)
+        type: integer
+        format: int32
+  Client.ClientPasswordResetConfirmation:
+    type: object
+    required:
+      - password
+      - token
+    properties:
+      password:
+        description: Password
+        type: string
+      token:
+        description: Token from reset request
+        type: string
+  Client.ClientPasswordResetRequest:
+    type: object
+    required:
+      - email
+    properties:
+      email:
+        description: Email address
+        type: string
+        format: email
+  Client.ClientRegistrationData:
+    type: object
+    properties:
+      address:
+        description: Address of residence
+        type: string
+      agreements:
+        $ref: '#/definitions/Client.AgreementSet'
+      attributes:
+        type: object
+        additionalProperties:
+          description: Some additional properties
+          type: string
+      city:
+        description: City of residence
+        type: string
+      company:
+        description: Company name
+        type: string
+      countryCode:
+        description: 'Country code, e.g. "pl" (ISO 3166)'
+        type: string
+      customId:
+        description: Your custom identifier of this client (e.g. from the external system)
+        type: string
+      email:
+        description: Email address
+        type: string
+      firstName:
+        description: First name
+        type: string
+      lastName:
+        description: Last name
+        type: string
+      password:
+        description: Password
+        type: string
+      phone:
+        description: Phone number
+        type: string
+      province:
+        description: Province name
+        type: string
+      sex:
+        type: string
+        description: Sex
+        enum:
+          - NOT_SPECIFIED
+          - FEMALE
+          - MALE
+      tags:
+        type: array
+        description: List of tags to assign
+        items:
+          type: string
+      zipCode:
+        description: Zip code
+        type: string
+  Client.ClientView:
+    type: object
+    properties:
+      anonymous:
+        type: boolean
+        description: 'True if the client has not been identified yet, false otherwise'
+      clientId:
+        description: Client ID
+        type: integer
+        format: int64
+      email:
+        type: string
+        description: Email address
+        format: email
+      phone:
+        type: string
+        description: Phone number
+      customId:
+        type: string
+        description: Your custom identifier of this client (eg. from the external system)
+      firstName:
+        type: string
+        description: First name
+      lastName:
+        type: string
+        description: Last name
+      displayName:
+        type: string
+        description: 'Name used for display, eg. nickname'
+      uuid:
+        type: string
+        description: Unique identifier of an anonymous client
+        format: uuid
+      avatarUrl:
+        type: string
+        description: URL of the avatar image
+      birthDate:
+        type: string
+        format: date
+        description: 'Birth date, eg. 1986-04-26'
+      company:
+        type: string
+        description: Company name
+      city:
+        type: string
+        description: City of residence
+      address:
+        type: string
+        description: Address of residence
+      zipCode:
+        type: string
+        description: Zip code
+      province:
+        type: string
+        description: Province name
+      countryCode:
+        type: string
+        description: 'Country code, eg. "pl" (ISO 3166)'
+      sex:
+        type: string
+        description: Sex
+        enum:
+          - NOT_SPECIFIED
+          - FEMALE
+          - MALE
+      agreements:
+        $ref: '#/definitions/Client.AgreementSet'
+        description: Set of marketing agreements
+      attributes:
+        type: object
+        description: Custom attributes
+        additionalProperties:
+          type: string
+      tags:
+        type: array
+        description: List of assigned tags
+        items:
+          type: string
+  Client.ListView:
+    type: object
+    properties:
+      count:
+        description: Count of clients in this list
+        type: integer
+        format: int64
+      expiration:
+        description: >-
+          When this list expires (it would be inaccessible after that point in
+          time)
+        type: string
+        format: date-time
+      id:
+        description: The ID of the list
+        type: string
+        format: uuid
+  Client.NewClientData:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Email address
+        format: email
+      phone:
+        type: string
+        description: Phone number
+      customId:
+        type: string
+        description: Your custom identifier of this client (e.g. from the external system)
+      firstName:
+        type: string
+        description: First name
+      lastName:
+        type: string
+        description: Last name
+      displayName:
+        type: string
+        description: 'Name used for display, e.g. nickname'
+      uuid:
+        type: string
+        description: Unique identifier of an anonymous client
+        format: uuid
+      avatarUrl:
+        type: string
+        description: URL of the avatar image
+      birthDate:
+        type: string
+        format: date
+        description: 'Birth date, e.g. 1986-04-26'
+      company:
+        type: string
+        description: Company name
+      city:
+        type: string
+        description: City of residence
+      address:
+        type: string
+        description: Address of residence
+      zipCode:
+        type: string
+        description: Zip code
+      province:
+        type: string
+        description: Province name
+      countryCode:
+        type: string
+        description: 'Country code, e.g. "pl" (ISO 3166)'
+      sex:
+        type: string
+        description: Sex
+        enum:
+          - NOT_SPECIFIED
+          - FEMALE
+          - MALE
+      agreements:
+        $ref: '#/definitions/Client.AgreementSet'
+        description: Set of marketing agreements
+      attributes:
+        type: object
+        description: Custom attributes (you can send us whatever you want)
+        additionalProperties:
+          type: string
+      tags:
+        type: array
+        description: List of tags to assign
+        items:
+          type: string
+  Transactions.ClientIdentification:
+    type: object
+    description: Client's identification data (one of these fields is required)
+    properties:
+      clientId:
+        description: Client ID
+        type: integer
+        format: int64
+      customId:
+        description: Your custom identifier of this client (e.g. from the external system)
+        type: string
+      email:
+        description: Email address
+        type: string
+      uuid:
+        description: Unique identifier of an anonymous client
+        type: string
+  Transactions.ProductData:
+    type: object
+    description: Information about the products
+    properties:
+      categories:
+        type: array
+        description: List of categories this product belongs to
+        items:
+          type: string
+      discountPercent:
+        description: 'Discount percent (100 = 100%, 15.4 = 15.4% etc.)'
+        type: number
+        format: float
+        minimum: 0
+      discountPrice:
+        $ref: '#/definitions/Common.Money'
+      finalUnitPrice:
+        $ref: '#/definitions/Common.Money'
+      image:
+        description: Image of the product
+        type: string
+        format: url
+        minLength: 7
+      name:
+        description: Name of the product
+        type: string
+        minLength: 1
+        maxLength: 256
+      netUnitPrice:
+        $ref: '#/definitions/Common.Money'
+      quantity:
+        description: Quantity
+        type: number
+        format: float
+        minimum: 0
+      regularPrice:
+        $ref: '#/definitions/Common.Money'
+      sku:
+        description: Stock keeping unit
+        type: string
+      tax:
+        description: 'Tax (100 = 100%, 23 = 23% etc.)'
+        type: number
+        format: float
+        minimum: 0
+      url:
+        description: Product url
+        type: string
+        format: url
+        minLength: 7
+  Transactions.TransactionData:
+    type: object
+    properties:
+      client:
+        $ref: '#/definitions/Transactions.ClientIdentification'
+      discountAmount:
+        $ref: '#/definitions/Common.Money'
+      discountCode:
+        description: Discount code
+        type: string
+        minLength: 2
+        maxLength: 128
+      discountPercent:
+        description: 'Discount percent (100 = 100%, 15.4 = 15.4% etc.)'
+        type: number
+        format: float
+        minimum: 0
+        exclusiveMinimum: true
+      metadata:
+        description: >-
+          Additional information about transaction, you can send us whatever you
+          want
+        type: object
+      orderId:
+        description: Order ID
+        type: string
+        minLength: 1
+        maxLength: 64
+      orderStatus:
+        description: Order status
+        type: string
+        minLength: 2
+        maxLength: 64
+      paymentInfo:
+        description: >-
+          Machine-readable payment details (you can send us whatever you want,
+          keeping the format dependable on the way you process payments in your
+          e-commerce system)
+        type: object
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/Transactions.ProductData'
+      recordedAt:
+        description: Date when the transaction has been recorded
+        type: string
+        format: date-time
+      revenue:
+        $ref: '#/definitions/Common.Money'
+      source:
+        type: string
+        enum:
+          - WEB_DESKTOP
+          - WEB_MOBILE
+          - MOBILE_APP
+          - POS
+      value:
+        $ref: '#/definitions/Common.Money'
+  Transactions.TransactionListingResponse:
+    type: object
+    properties:
+      currentCount:
+        description: Number of transactions contained in the response
+        type: integer
+        format: int32
+      endingOffset:
+        description: The offset of the last transaction returned in the response
+        type: integer
+        format: int64
+      startingOffset:
+        description: The offset of the first transaction returned in the response
+        type: integer
+        format: int64
+      totalCount:
+        description: Total number of transactions matching your filtering criteria
+        type: integer
+        format: int64
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/Transactions.TransactionView'
+  Transactions.ProductView:
+    type: object
+    description: List of products' properties
+    additionalProperties:
+      description: Some additional properties
+      type: object
+  Transactions.TransactionView:
+    type: object
+    description: List of transactions
+    properties:
+      clientId:
+        description: Client ID
+        type: integer
+        format: int64
+      metadata:
+        description: >-
+          Additional information about transaction, you can send us whatever you
+          want
+        type: object
+      online:
+        description: >-
+          Shows if transaction was made online (offline transactions are these
+          made through POS terminals)
+        type: boolean
+      orderId:
+        description: Order ID
+        type: string
+        minLength: 1
+        maxLength: 64
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/Transactions.ProductView'
+      recordedAt:
+        description: Date when the transaction has been recorded
+        type: string
+        format: date-time
+      source:
+        description: Source of transaction
+        type: string
+      storedAt:
+        description: Date when the transaction has been saved by Synerise
+        type: string
+        format: date-time
+      value:
+        $ref: '#/definitions/Common.Money'
+  Error403:
+    allOf:
+      - $ref: '#/definitions/Error'
+    example:
+      timestamp: '2017-06-29T15:23:33Z'
+      status: 403
+      error: Forbidden
+      message: ...
+      path: ...
+  Error400:
+    allOf:
+      - $ref: '#/definitions/Error'
+    example:
+      timestamp: '2017-06-29T15:23:33Z'
+      status: 400
+      error: Bad request
+      message: ...
+      path: ...
+  Error:
+    type: object
+    properties:
+      timestamp:
+        description: Error time
+        type: string
+        format: date-time
+      status:
+        description: HTTP status code
+        type: integer
+      error:
+        description: HTTP error description
+        type: string
+      message:
+        description: More friendly message
+        type: string
+      path:
+        description: Request URI
+        type: string
+  Error401:
+    allOf:
+      - $ref: '#/definitions/Error'
+    example:
+      timestamp: '2017-06-29T15:23:33Z'
+      status: 401
+      error: Unauthorized
+      message: ...
+      path: ...
+  Error404:
+    allOf:
+      - $ref: '#/definitions/Error'
+    example:
+      timestamp: '2017-06-29T15:23:33Z'
+      status: 404
+      error: Not Found
+      message: ...
+      path: ...
